@@ -1,9 +1,0 @@
-// เอฟเฟกต์คลิกปุ่ม
-document.querySelectorAll(".btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    btn.style.transform = "scale(0.9)";
-    setTimeout(() => {
-      btn.style.transform = "scale(1)";
-    }, 150);
-  });
-});
