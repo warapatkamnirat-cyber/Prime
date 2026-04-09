@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PRIME AUTHENTICATION | STABLE v3.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #D4AF37; --deep-bg: #030712; }
+        body { font-family: 'Kanit', sans-serif; background: var(--deep-bg); color: #fff; min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        /* Premium Background */
+        .bg-layer { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, #111827 0%, #000 100%); z-index: -1; }
+        .grid-overlay { position: fixed; inset: 0; background-image: radial-gradient(rgba(212,175,55,0.05) 1.5px, transparent 1.5px); background-size: 40px 40px; z-index: -1; }
+
+        /* Vault Card */
+        .vault-card { 
+            background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(30px); 
+            border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 50px;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.5); width: 90%; max-width: 420px;
+            padding: 3rem 2.5rem; position: relative;
+        }
+
+        .scanline { position: absolute; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); top: 0; left: 0; opacity: 0.3; animation: scan 4s linear infinite; }
+        @keyframes scan { 0% { top: 0; opacity: 0; } 50% { opacity: 0.5; } 100% { top: 100%; opacity: 0; } }
+
+        /* Button Node */
+        .auth-node { 
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 24px; cursor: pointer;
+        }
+        .auth-node:hover { background: rgba(255,255,255,0.08); border-color: var(--gold); transform: scale(1.02); }
+        .auth-node:active { transform: scale(0.98); }
+
+        /* Notification Box */
+        #notification-box { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; }
+        .modal-inner { background: #111827; border: 1px solid var(--gold); border-radius: 35px; width: 85%; max-width: 320px; padding: 2.5rem; text-align: center; }
+
+        /* Status Spinner */
+        .spinner { width: 32px; height: 32px; border: 3px solid rgba(212,175,55,0.1); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="bg-layer"></div>
+    <div class="grid-overlay"></div>
+
+    <div id="notification-box">
+        <div class="modal-inner">
+            <div id="modal-icon" class="mb-4 text-4xl"></div>
+            <h3 id="modal-title" class="text-xl font-black italic uppercase mb-2"></h3>
+            <p id="modal-desc" class="text-gray-400 text-xs mb-8"></p>
+            <button id="close-modal-btn" class="w-full py-4 bg-white text-black font-black rounded-2xl text-xs uppercase tracking-widest active:scale-95 transition">ตกลง</button>
+        </div>
+    </div>
+
+    <div class="vault-card text-center">
+        <div class="scanline"></div>
+        
+        <header class="mb-12">
+            <div class="w-20 h-20 mx-auto mb-6 relative">
+                <div class="absolute inset-0 bg-yellow-500 opacity-20 blur-2xl rounded-full"></div>
+                <img src="PrimeStore.png" class="w-full h-full object-contain relative z-10 drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]">
+            </div>
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">Prime Store</h1>
+            <p class="text-[8px] text-gray-500 font-bold tracking-[0.5em] uppercase">Core Security Access</p>
+        </header>
+
+        <div id="btn-group" class="space-y-4">
+            <button id="google-login" class="auth-node w-full py-5 px-8 flex items-center justify-between group">
+                <div class="flex items-center gap-4">
+                    <img src="https://www.google.com/favicon.ico" class="w-5 h-5">
+                    <span class="text-xs font-black uppercase tracking-wider">Google Network</span>
+                </div>
+                <div class="text-[10px] text-gray-600 font-mono">01</div>
+            </button>
+
+            <button id="fb-login" class="auth-node w-full py-5 px-8 flex items-center justify-between group">
+                <div class="flex items-center gap-4">
+                    <svg class="w-5 h-5 text-blue-500 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <span class="text-xs font-black uppercase tracking-wider">Facebook Relay</span>
+                </div>
+                <div class="text-[10px] text-gray-600 font-mono">02</div>
+            </button>
+        </div>
+
+        <footer class="mt-12 pt-8 border-t border-white/5">
+            <div class="flex flex-col items-center gap-4">
+                <div id="status-area" class="flex items-center gap-3">
+                    <div id="ping" class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></div>
+                    <span id="status-text" class="text-gray-500 text-[8px] font-black uppercase tracking-[0.6em]">System Standby</span>
+                </div>
+                <div id="loader" class="hidden"><div class="spinner"></div></div>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, FacebookAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDne6T2ZmFrqP4idNGNHfp0CipTUxLkXHo",
+            authDomain: "prime-store-487ac.firebaseapp.com",
+            projectId: "prime-store-487ac",
+            storageBucket: "prime-store-487ac.firebasestorage.app",
+            messagingSenderId: "312275328003",
+            appId: "1:312275328003:web:92459c25dde3fd115c0236"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_ID = "primestore.antmob@gmail.com";
+
+        // UI Functions
+        const toggleLoader = (show) => {
+            document.getElementById('loader').classList.toggle('hidden', !show);
+            document.getElementById('ping').classList.toggle('hidden', show);
+            document.getElementById('btn-group').style.opacity = show ? '0.3' : '1';
+            document.getElementById('btn-group').style.pointerEvents = show ? 'none' : 'auto';
+            document.getElementById('status-text').innerText = show ? "AUTHENTICATING..." : "SYSTEM STANDBY";
+        };
+
+        const showAlert = (title, msg, icon = "⚠️") => {
+            document.getElementById('modal-icon').innerText = icon;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = msg;
+            document.getElementById('notification-box').style.display = 'flex';
+        };
+
+        document.getElementById('close-modal-btn').onclick = () => {
+            document.getElementById('notification-box').style.display = 'none';
+        };
+
+        // Auth Logic
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                toggleLoader(true);
+                const isAdmin = user.email.toLowerCase() === ADMIN_ID.toLowerCase();
+                
+                try {
+                    await setDoc(doc(db, "users", user.uid), {
+                        name: user.displayName,
+                        email: user.email,
+                        role: isAdmin ? "admin" : "member",
+                        lastLogin: serverTimestamp()
+                    }, { merge: true });
+
+                    document.getElementById('status-text').innerText = "ACCESS GRANTED";
+                    document.getElementById('status-text').classList.add(isAdmin ? 'text-yellow-500' : 'text-emerald-500');
+                    
+                    setTimeout(() => {
+                        window.location.href = isAdmin ? "admin.html" : "index.html";
+                    }, 800);
+                } catch (e) {
+                    showAlert("DATABASE ERROR", "การบันทึกข้อมูลล้มเหลว", "❌");
+                    toggleLoader(false);
+                }
+            }
+        });
+
+        // Redirect Handler (สำคัญมากสำหรับมือถือ)
+        getRedirectResult(auth).catch((error) => {
+            toggleLoader(false);
+            if (error.code !== 'auth/redirect-cancelled-by-user') {
+                showAlert("LOGIN FAILED", error.message);
+            }
+        });
+
+        // Event Listeners (ทางแก้ปัญหาปุ่มกดไม่ได้)
+        document.getElementById('google-login').onclick = () => {
+            toggleLoader(true);
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            signInWithRedirect(auth, provider);
+        };
+
+        document.getElementById('fb-login').onclick = () => {
+            toggleLoader(true);
+            const provider = new FacebookAuthProvider();
+            signInWithRedirect(auth, provider);
+        };
+
+    </script>
+</body>
+</html>

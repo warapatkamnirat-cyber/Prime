@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CONTACT SUPPORT | PRIME STORE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ตั้งค่าตัวแปรสีหลักๆ */
+    :root { --gold: #D4AF37; --discord: #5865F2; --line: #06C755; --fb: #1877F2; }
+    
+    /* สไตล์พื้นฐานของหน้า */
+    body { font-family: 'Kanit', sans-serif; background: #000; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; overflow: hidden; }
+    
+    /* สไตล์พื้นหลังแบบ Radial Gradient และ Grid */
+    .bg-layer { position: fixed; inset: 0; background: radial-gradient(circle at center, #111827 0%, #000 100%); z-index: -1; }
+    .grid-overlay { position: fixed; inset: 0; background-image: radial-gradient(rgba(212,175,55,0.05) 1px, transparent 1px); background-size: 35px 35px; z-index: -1; }
+
+    /* สไตล์ของกล่องคอนเทนต์ (Contact Card) */
+    .contact-card {
+      background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(25px);
+      border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 50px;
+      padding: 3.5rem 2rem; width: 90%; max-width: 400px; text-align: center;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+      /* แอนิเมชันตอนโหลดหน้า */
+      transform: translateY(40px); opacity: 0; transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    /* คลาสที่จะถูกเพิ่มด้วย JavaScript เพื่อแสดงแอนิเมชัน */
+    .contact-card.show { transform: translateY(0); opacity: 1; }
+
+    /* สไตล์ของกรอบโลโก้และเอฟเฟกต์เรืองแสง */
+    .logo-container { position: relative; width: 160px; height: 160px; margin: 0 auto 2.5rem; }
+    /* แสงฟุ้งสีทองด้านหลังโลโก้ */
+    .logo-glow { position: absolute; inset: 0; background: var(--gold); opacity: 0.15; filter: blur(40px); border-radius: 50%; animation: pulse 3s infinite; }
+    /* แอนิเมชันแสงวูบวาบ */
+    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.15; } 50% { transform: scale(1.2); opacity: 0.25; } }
+
+    /* สไตล์ของปุ่มติดต่อ */
+    .btn-contact {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 1.5rem; border-radius: 24px; font-weight: 700;
+      transition: all 0.3s; border: 1px solid rgba(255,255,255,0.05);
+      text-decoration: none; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+    }
+    /* เอฟเฟกต์ตอนเอาเมาส์ไปชี้ */
+    .btn-contact:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+    /* เอฟเฟกต์ตอนคลิก */
+    .btn-contact:active { transform: scale(0.95); }
+
+    /* สีเฉพาะของแต่ละปุ่มพร้อมเงา */
+    .line { background: var(--line); color: #fff; box-shadow: 0 10px 20px -5px rgba(6,199,85,0.3); }
+    .discord { background: var(--discord); color: #fff; box-shadow: 0 10px 20px -5px rgba(88,101,242,0.3); }
+    .facebook { background: var(--fb); color: #fff; box-shadow: 0 10px 20px -5px rgba(24,119,242,0.3); }
+  </style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
+
+<div class="contact-card" id="contactBox">
+  <header>
+    
+    <div class="logo-container">
+      <div class="logo-glow"></div>
+      
+      <img src="PrimeStore.png" id="mainLogo" alt="LOGO" class="w-full h-full object-contain relative z-10 drop-shadow-[0_0_30px_rgba(212,175,55,0.4)]">
+    </div>
+    <h2 class="text-3xl font-black italic tracking-tighter uppercase mb-2">Support Center</h2>
+    <p class="text-[10px] text-gray-500 font-bold tracking-[0.5em] uppercase mb-10">Connect with Admin</p>
+  </header>
+
+  <div class="space-y-4">
+    
+    <a href="https://line.me/R/ti/p/@480rvvhg" target="_blank" class="btn-contact line shadow-lg shadow-green-500/20">
+      <div class="flex items-center gap-4">
+        <img src="Line.jpg" 
+             alt="Line" 
+             class="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+        <div class="text-left">
+          <span class="block text-[10px] opacity-60 font-bold uppercase tracking-tighter text-white">Line Support</span>
+          <span class="block text-xs font-black text-white">Line Official</span>
+        </div>
+      </div>
+      <svg class="w-4 h-4 opacity-50 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+    </a>
+
+    <a href="https://discord.gg/3ASn4VWxq" target="_blank" class="btn-contact discord shadow-lg shadow-indigo-500/20">
+      <div class="flex items-center gap-4">
+        <img src="discord.png" 
+             alt="Discord" 
+             class="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+        <div class="text-left">
+          <span class="block text-[10px] opacity-60 font-bold uppercase tracking-tighter text-white">Community Hub</span>
+          <span class="block text-xs font-black text-white">Discord Server</span>
+        </div>
+      </div>
+      <svg class="w-4 h-4 opacity-50 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+    </a>
+
+    <a href="https://www.facebook.com/share/1CBU1v2YiU/" target="_blank" class="btn-contact facebook shadow-lg shadow-blue-500/20">
+      <div class="flex items-center gap-4">
+        <img src="Facebook.png" 
+             alt="Facebook" 
+             class="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+        <div class="text-left">
+          <span class="block text-[10px] opacity-60 font-bold uppercase tracking-tighter text-white">Fanpage Relay</span>
+          <span class="block text-xs font-black text-white">Facebook Page</span>
+        </div>
+      </div>
+      <svg class="w-4 h-4 opacity-50 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+    </a>
+    
+  </div>
+
+
+  <div class="mt-10 pt-8 border-t border-white/5">
+    <div class="flex items-center justify-center gap-2 mb-2">
+        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></div>
+        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Available: 10:00 - 22:00</span>
+    </div>
+    <a href="index.html" class="inline-block mt-4 text-[9px] text-gray-600 hover:text-white transition font-black tracking-[0.3em] uppercase">⬅ Back to Terminal</a>
+  </div>
+</div>
+
+<script>
+  window.onload = () => {
+    // แอนิเมชันแสดงกล่องคอนเทนต์ตอนโหลดหน้า
+    setTimeout(() => {
+      document.getElementById("contactBox").classList.add("show");
+    }, 150);
+
+    // ตรวจสอบถ้าไม่มีไฟล์รูป ให้โชว์เป็นตัวอักษรแก้ขัดไปก่อน
+    const img = document.getElementById('mainLogo');
+    // ถ้าโหลดรูปไม่สำเร็จ (onerror) ให้รันฟังก์ชันนี้
+    img.onerror = function() {
+        // เปลี่ยนเนื้อหาข้างในเป็นตัวอักษร P สีทองแทน
+        this.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-4xl font-black text-yellow-500 border-4 border-yellow-500 rounded-full">P</div>';
+    };
+  };
+</script>
+
+</body>
+</html>

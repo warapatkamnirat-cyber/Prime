@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PRIME ADMIN | ULTIMATE V.28.6</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #080a0c; color: #eaecef; overflow-x: hidden; }
+        .gold-text { color: #f0b90b; }
+        .card { background: #12161c; border: 1px solid #2b3139; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+        .tab-content { display: none; padding-bottom: 100px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        input, select { background: #1b1f24 !important; border: 1px solid #363c44 !important; color: white !important; border-radius: 10px !important; padding: 12px !important; width: 100%; outline: none !important; font-size: 13px; transition: 0.2s; }
+        input:focus, select:focus { border-color: #f0b90b !important; }
+        
+        .btn-gold { background: linear-gradient(145deg, #f0b90b, #d4a008); color: black; font-weight: 800; padding: 15px; border-radius: 12px; width: 100%; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-gold:active { transform: scale(0.97); }
+        .btn-gold:disabled { background: #2b3139; color: #5e6673; cursor: not-allowed; transform: none; border: 1px solid #363c44; }
+        
+        nav { position: fixed; bottom: 0; width: 100%; background: rgba(18, 22, 28, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #2b3139; display: flex; z-index: 100; padding: 10px 0 15px 0; }
+        .nav-item { flex: 1; text-align: center; font-size: 9px; color: #5e6673; font-weight: bold; display: flex; flex-direction: column; gap: 4px; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: #f0b90b; transform: translateY(-2px); }
+        
+        #img-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #363c44; border-radius: 4px; }
+        
+        body { 
+    font-family: 'Kanit', sans-serif; 
+    background: #080a0c; 
+    color: #eaecef; 
+    /* แก้ไขตรงนี้: เปลี่ยนจาก hidden เป็น auto และลบ overflow-x ออก */
+    overflow-y: auto !important; 
+    height: auto !important;
+    min-height: 100vh;
+    padding-bottom: 80px; /* กันเมนูข้างล่างบัง */
+}
+
+/* เพิ่มให้เลื่อนในมือถือลื่นขึ้น */
+.tab-content { 
+    display: none; 
+    height: auto;
+    overflow: visible;
+}
+
+    </style>
+</head>
+<body onload="startAdmin()">
+
+    <div id="img-viewer" onclick="this.style.display='none'">
+        <img id="full-img" src="" class="max-w-[90%] max-h-[80%] rounded-xl border border-white/10 shadow-2xl">
+        <p class="absolute bottom-10 text-[10px] text-gray-500 font-bold uppercase tracking-widest">คลิกที่ใดก็ได้เพื่อปิด</p>
+    </div>
+
+    <header class="p-5 border-b border-[#2b3139] flex justify-between items-center bg-[#0d1117] sticky top-0 z-50 shadow-md">
+        <div>
+            <h1 class="text-lg font-black italic gold-text uppercase leading-none">Prime Admin</h1>
+            <p id="status-msg" class="text-[8px] text-red-500 font-bold uppercase italic mt-1 animate-pulse">ระบบพร้อมทำงาน</p>
+        </div>
+        <div id="clock" class="text-xs font-mono text-[#00ffad] font-bold bg-[#00ffad]/10 px-2 py-1 rounded">00:00:00</div>
+    </header>
+
+    <main id="tab-orders" class="tab-content active p-4 space-y-4">
+        <div class="flex justify-between items-center px-1">
+            <h3 class="text-xs font-black text-gray-500 uppercase italic">🛎️ รายการรออนุมัติ (Pending)</h3>
+            <span class="text-[9px] text-[#00ffad] font-bold bg-[#00ffad]/10 px-2 py-1 rounded" id="order-count">0 รายการ</span>
+        </div>
+        <div id="pending-list" class="space-y-3"></div>
+    </main>
+
+    <main id="tab-stock" class="tab-content p-4">
+        <div class="card p-5 space-y-4 border-t-2 border-[#f0b90b]">
+            <h2 class="gold-text font-black italic uppercase text-center text-lg">📦 ลงสินค้า & ตู้สุ่ม</h2>
+            <div class="flex flex-col items-center gap-2 border-2 border-dashed border-[#363c44] hover:border-[#f0b90b] transition-colors p-4 rounded-xl bg-black/20">
+                <input type="file" id="p-img-input" accept="image/*" class="hidden" onchange="handleImage(this)">
+                <div onclick="document.getElementById('p-img-input').click()" class="cursor-pointer text-center w-full flex flex-col items-center">
+                    <img id="preview-img" src="https://placehold.co/400x400/1b1f24/5e6673?text=UPLOAD+IMG" class="w-24 h-24 object-cover rounded-lg mb-2 border border-[#363c44] shadow-md">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">แตะเพื่ออัปโหลดภาพประกอบ</p>
+                </div>
+            </div>
+
+            <select id="p-type" onchange="genRows(); checkInput();">
+                <option value="ID">📦 สินค้าทั่วไป (ขายขาด รับรหัสทันที)</option>
+                <option value="GACHA">🎰 สินค้าตู้สุ่ม (สุ่มตามโอกาส %)</option>
+            </select>
+
+            <input type="text" id="p-name" placeholder="ชื่อสินค้า/รุ่น" oninput="checkInput()">
+            
+            <div class="grid grid-cols-2 gap-2">
+                <div class="space-y-2">
+                    <select id="p-game" onchange="toggleCustomGame(); checkInput();">
+                        <option value="Free Fire">Free Fire</option>
+                        <option value="Roblox">Roblox</option>
+                        <option value="ROV">ROV</option>
+                        <option value="CUSTOM">อื่นๆ... (ระบุเอง)</option>
+                    </select>
+                    <input type="text" id="p-game-custom" placeholder="พิมพ์ชื่อเกม..." class="hidden !bg-black border-[#f0b90b]" oninput="checkInput()">
+                </div>
+                <div>
+                    <input type="number" id="p-price" placeholder="ราคา (บาท)" oninput="checkInput()">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-[#1b1f24] p-2 rounded-xl border border-[#363c44]">
+                <p class="text-[10px] text-gray-500 uppercase font-bold w-full pl-2">จำนวนชุด:</p>
+                <input type="number" id="p-count" placeholder="0" class="!w-20 !p-1 text-center font-black !border-none !bg-transparent" oninput="genRows(); checkInput();">
+            </div>
+
+            <div id="p-rows" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar border-y border-white/5 py-2"></div>
+            <button id="save-btn" onclick="saveStock()" class="btn-gold shadow-lg shadow-yellow-500/20" disabled>บันทึกเข้าคลังสินค้า</button>
+        </div>
+    </main>
+
+    <main id="tab-warehouse" class="tab-content p-4 space-y-4">
+        <div class="flex justify-between items-center px-1">
+            <h3 class="text-xs font-black text-gray-500 uppercase italic">🏬 สินค้าพร้อมจำหน่าย</h3>
+            <span id="stock-total" class="text-[9px] gold-text font-bold bg-yellow-500/10 px-2 py-1 rounded"></span>
+        </div>
+        <div id="warehouse-list" class="space-y-3 pb-10"></div>
+    </main>
+
+    <main id="tab-finance" class="tab-content p-4 space-y-4">
+        <div class="grid grid-cols-2 gap-3 text-center">
+            <div class="card p-4 border-b-2 border-[#00ffad]">
+                <p class="text-[9px] text-gray-500 font-bold uppercase mb-1">ยอดเข้าวันนี้</p>
+                <h4 id="sum-day" class="text-2xl font-black text-[#00ffad]">฿ 0</h4>
+            </div>
+            <div class="card p-4 border-b-2 border-[#f0b90b]">
+                <p class="text-[9px] text-gray-500 font-bold uppercase mb-1">สะสมทั้งหมด</p>
+                <h4 id="sum-all" class="text-2xl font-black gold-text">฿ 0</h4>
+            </div>
+        </div>
+        <h3 class="text-[10px] font-black text-gray-500 uppercase italic mt-4 px-1">ประวัติการเติมเงินล่าสุด</h3>
+        <div id="ledger-list" class="space-y-2 pb-10"></div>
+    </main>
+
+    <div id="modal" class="fixed inset-0 bg-black/98 hidden z-[1000] p-4 flex flex-col justify-center backdrop-blur-sm">
+        <div class="card p-5 space-y-5 max-w-sm mx-auto w-full border-t-4 border-[#00ffad] shadow-2xl shadow-[#00ffad]/10">
+            <div class="flex gap-4">
+                <div class="w-1/3 aspect-[3/4] bg-[#080a0c] rounded-lg border border-[#363c44] overflow-hidden cursor-pointer" onclick="viewSlip(document.getElementById('m-slip-img').src)">
+                    <img id="m-slip-img" src="" class="w-full h-full object-cover">
+                </div>
+                <div class="w-2/3 flex flex-col justify-center">
+                    <p id="m-email" class="text-xs font-black gold-text italic truncate"></p>
+                    <p class="text-[9px] text-gray-400 font-bold uppercase mt-2">ยอดเงินที่จะเติม</p>
+                    <div id="m-display" class="text-4xl font-black text-[#00ffad] p-2 bg-[#080a0c] border border-[#363c44] rounded-lg text-center mt-1">0</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(1)">1</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(2)">2</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(3)">3</button>
+                <button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(4)">4</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(5)">5</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(6)">6</button>
+                <button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(7)">7</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(8)">8</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(9)">9</button>
+                <button class="card h-14 font-black text-xl text-red-500 active:bg-red-500 active:text-white" onclick="num('C')">C</button><button class="card h-14 font-black text-xl active:bg-[#f0b90b] active:text-black" onclick="num(0)">0</button><button class="card h-14 font-black text-xl text-[#00ffad] bg-[#00ffad]/5 active:bg-[#00ffad] active:text-black" onclick="finalize()">OK</button>
+            </div>
+            <button onclick="closeModal()" class="w-full text-[10px] text-gray-500 font-bold uppercase underline mt-2">ยกเลิก</button>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-item active" onclick="switchTab('orders')" id="n-orders"><span class="text-lg mb-1">🛎️</span>ออเดอร์</div>
+        <div class="nav-item" onclick="switchTab('stock')" id="n-stock"><span class="text-lg mb-1">📦</span>ลงของ</div>
+        <div class="nav-item" onclick="switchTab('warehouse')" id="n-warehouse"><span class="text-lg mb-1">🏬</span>โกดัง</div>
+        <div class="nav-item" onclick="switchTab('finance')" id="n-finance"><span class="text-lg mb-1">📊</span>บัญชี</div>
+    </nav>
+    <script>
+        let db_pending = [], db_ledger = [], db_stock = [], fIn = "0", activeOrder = null, currentImg = "";
+
+        function startAdmin() {
+            refreshData();
+            setInterval(refreshData, 3000);
+            setInterval(() => document.getElementById('clock').innerText = new Date().toLocaleTimeString(), 1000);
+            checkInput();
+        }
+
+        function refreshData() {
+            db_pending = JSON.parse(localStorage.getItem('b_v26_pending')) || [];
+            db_ledger = JSON.parse(localStorage.getItem('b_v26_ledger')) || [];
+            db_stock = JSON.parse(localStorage.getItem('b_v26_stock')) || [];
+            
+            if(document.getElementById('tab-orders').classList.contains('active')) renderOrders();
+            if(document.getElementById('tab-warehouse').classList.contains('active')) renderWarehouse();
+            if(document.getElementById('tab-finance').classList.contains('active')) renderFinance();
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('.tab-content, .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            document.getElementById('n-' + id).classList.add('active');
+            refreshData();
+        }
+        
+        function handleImage(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImg = e.target.result;
+                    document.getElementById('preview-img').src = currentImg;
+                    checkInput();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function toggleCustomGame() {
+            const gameSelect = document.getElementById('p-game');
+            const customInput = document.getElementById('p-game-custom');
+            if(gameSelect.value === "CUSTOM") {
+                customInput.classList.remove('hidden');
+            } else {
+                customInput.classList.add('hidden');
+                customInput.value = ""; 
+            }
+        }
+
+        function genRows() {
+            const count = document.getElementById('p-count').value;
+            const type = document.getElementById('p-type').value;
+            const container = document.getElementById('p-rows');
+            container.innerHTML = '';
+            
+            for(let i=1; i<=count; i++) {
+                let rowHtml = `<div class="flex gap-1 bg-black/30 p-2 rounded-lg border border-white/5">
+                    <input type="text" class="r-u !p-2 !text-[11px] !bg-[#1b1f24]" placeholder="ID / USER ${i}" oninput="checkInput()">
+                    <input type="text" class="r-p !p-2 !text-[11px] !bg-[#1b1f24]" placeholder="PASSWORD ${i}" oninput="checkInput()">`;
+                
+                if(type === 'GACHA') {
+                    rowHtml += `<input type="number" class="r-c !p-2 !text-[11px] !bg-[#1b1f24] w-20 text-center" placeholder="โอกาส %" oninput="checkInput()">`;
+                }
+                rowHtml += `</div>`;
+                container.innerHTML += rowHtml;
+            }
+            checkInput();
+        }
+
+        function checkInput() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const count = document.getElementById('p-count').value;
+            const type = document.getElementById('p-type').value;
+            const gameSelect = document.getElementById('p-game').value;
+            const gameCustom = document.getElementById('p-game-custom').value;
+            const saveBtn = document.getElementById('save-btn');
+            const status = document.getElementById('status-msg');
+
+            let rowsComplete = true;
+            let isGameReady = (gameSelect === "CUSTOM") ? (gameCustom.trim() !== "") : true;
+
+            const uRows = document.querySelectorAll('.r-u');
+            const pRows = document.querySelectorAll('.r-p');
+            const cRows = document.querySelectorAll('.r-c');
+
+            if(uRows.length === 0 || count <= 0) rowsComplete = false;
+            uRows.forEach((u, i) => {
+                if(!u.value || !pRows[i].value) rowsComplete = false;
+                if(type === 'GACHA' && (!cRows[i] || !cRows[i].value)) rowsComplete = false;
+            });
+
+            if(name && price && count > 0 && currentImg && rowsComplete && isGameReady) {
+                saveBtn.disabled = false;
+                status.innerText = "ข้อมูลครบถ้วน พร้อมบันทึก ✅";
+                status.classList.replace('text-red-500', 'text-[#00ffad]');
+            } else {
+                saveBtn.disabled = true;
+                let errorMsg = "กรุณากรอกข้อมูลให้ครบ";
+                if(!currentImg) errorMsg = "ขาด: รูปภาพ 📸";
+                else if(!name || !price) errorMsg = "ขาด: ชื่อหรือราคา ❌";
+                else if(!isGameReady) errorMsg = "ขาด: ชื่อเกม 🎮";
+                else if(!rowsComplete) errorMsg = "ขาด: รหัสหรือโอกาส ⚠️";
+                status.innerText = errorMsg;
+                status.classList.replace('text-[#00ffad]', 'text-red-500');
+            }
+        }
+
+        function saveStock() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const type = document.getElementById('p-type').value;
+            let game = document.getElementById('p-game').value;
+            if(game === "CUSTOM") game = document.getElementById('p-game-custom').value;
+            
+            const items = Array.from(document.querySelectorAll('.r-u')).map((v, i) => ({
+                u: v.value, p: document.querySelectorAll('.r-p')[i].value, chance: type === 'GACHA' ? document.querySelectorAll('.r-c')[i].value : null
+            }));
+
+            db_stock.push({ id: Date.now(), name, price, game, type, img: currentImg, items });
+            localStorage.setItem('b_v26_stock', JSON.stringify(db_stock));
+            alert("✅ บันทึกสินค้าเข้าคลังเรียบร้อย!"); location.reload();
+        }
+
+        function renderWarehouse() {
+            document.getElementById('stock-total').innerText = db_stock.length + " รายการ";
+            document.getElementById('warehouse-list').innerHTML = db_stock.map((s, idx) => `
+                <div class="card p-3 flex gap-4 items-center border-l-4 ${s.type === 'GACHA' ? 'border-purple-500' : 'border-[#f0b90b]'}">
+                    <img src="${s.img}" class="w-16 h-16 object-cover rounded-lg border border-white/5 shadow-md">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="flex gap-1"><span class="text-[7px] ${s.type === 'GACHA' ? 'bg-purple-500' : 'bg-yellow-500'} text-black px-1.5 py-0.5 rounded font-black uppercase">${s.type}</span><span class="text-[7px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded font-bold uppercase">${s.game}</span></div>
+                            <button onclick="delStock(${idx})" class="text-red-500 text-[9px] underline font-bold bg-red-500/10 px-2 py-0.5 rounded">ลบออก</button>
+                        </div>
+                        <h4 class="text-xs font-black text-white italic truncate w-40">${s.name}</h4>
+                        <div class="flex justify-between items-end mt-1"><p class="text-sm font-black text-[#00ffad]">฿${parseFloat(s.price).toLocaleString()}</p><p class="text-[9px] text-gray-400 font-bold">In Stock: <span class="text-white">${s.items.length}</span></p></div>
+                    </div>
+                </div>
+            `).join('') || '<div class="py-20 text-center italic opacity-20 text-xs">คลังสินค้าว่างเปล่า</div>';
+        }
+
+        function delStock(i) { if(confirm("ต้องการลบสินค้านี้ออกจากคลัง?")) { db_stock.splice(i, 1); localStorage.setItem('b_v26_stock', JSON.stringify(db_stock)); refreshData(); } }
+
+        function renderOrders() {
+            const list = document.getElementById('pending-list');
+            document.getElementById('order-count').innerText = db_pending.length + " รายการ";
+            if(!db_pending.length) { list.innerHTML = `<div class="card p-10 text-center opacity-20 text-xs italic">ไม่มีรายการรออนุมัติ</div>`; return; }
+            list.innerHTML = db_pending.map(o => `
+                <div class="card p-4 border-l-4 ${o.method === 'ANGPAO' ? 'border-red-500 bg-red-500/5' : 'border-yellow-500'} flex justify-between items-center transition-all hover:scale-[1.01]">
+                    <div class="flex gap-3 items-center w-2/3">
+                        <div class="relative cursor-pointer" onclick="viewSlip('${o.slip}')">
+                            <img src="${o.method === 'ANGPAO' ? 'https://cdn-icons-png.flaticon.com/512/10042/10042078.png' : o.slip}" class="w-12 h-12 object-cover rounded-lg border border-white/10 bg-black">
+                            ${o.method === 'ANGPAO' ? '<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[6px] px-1 rounded-full animate-bounce">LINK</span>' : ''}
+                        </div>
+                        <div class="truncate"><p class="text-[8px] ${o.method === 'ANGPAO' ? 'text-red-500' : 'text-yellow-500'} font-black uppercase italic">${o.method || 'แจ้งโอนบัญชี'}</p><h4 class="text-[11px] font-bold text-white truncate w-full">${o.email}</h4></div>
+                    </div>
+                    <div class="flex gap-2 w-1/3 justify-end">
+                        <button onclick="delOrder('${o.id}')" class="w-8 h-8 flex items-center justify-center bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg font-black text-xs">✕</button>
+                        <button onclick="openModal('${o.id}')" class="flex-1 bg-[#00ffad] text-black rounded-lg font-black uppercase text-[10px] shadow-lg shadow-[#00ffad]/20">ตรวจ</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewSlip(url) { if(url.includes('gift.truemoney.com')) { window.open(url, '_blank'); return; } document.getElementById('full-img').src = url; document.getElementById('img-viewer').style.display = 'flex'; }
+        function openModal(id) { activeOrder = db_pending.find(x => x.id == id); fIn = "0"; document.getElementById('m-email').innerText = activeOrder.email; document.getElementById('m-slip-img').src = activeOrder.method === 'ANGPAO' ? 'https://cdn-icons-png.flaticon.com/512/10042/10042078.png' : activeOrder.slip; updateD(); document.getElementById('modal').classList.remove('hidden'); }
+        function delOrder(id) { if(confirm("ปฏิเสธ/ลบรายการนี้?")) { db_pending = db_pending.filter(x => x.id != id); localStorage.setItem('b_v26_pending', JSON.stringify(db_pending)); refreshData(); } }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        function num(n) { if(n==='C') fIn="0"; else fIn === "0" ? fIn = n.toString() : fIn += n.toString(); updateD(); }
+        function updateD() { document.getElementById('m-display').innerText = Number(fIn).toLocaleString(); }
+
+        function finalize() {
+            if(fIn === "0") return;
+            const amt = parseFloat(fIn);
+            let currentBal = parseFloat(localStorage.getItem('user_balance')) || 0;
+            localStorage.setItem('user_balance', (currentBal + amt).toFixed(2));
+            db_ledger.unshift({ email: activeOrder.email, amt: amt, date: new Date().toISOString() });
+            localStorage.setItem('b_v26_ledger', JSON.stringify(db_ledger));
+            db_pending = db_pending.filter(x => x.id != activeOrder.id);
+            localStorage.setItem('b_v26_pending', JSON.stringify(db_pending));
+            closeModal(); refreshData();
+        }
+
+        function renderFinance() {
+            const today = new Date().toISOString().split('T')[0];
+            const sDay = db_ledger.filter(x => x.date.startsWith(today)).reduce((a,b) => a + b.amt, 0);
+            const sAll = db_ledger.reduce((a,b) => a + b.amt, 0);
+            document.getElementById('sum-day').innerText = `฿ ${sDay.toLocaleString()}`;
+            document.getElementById('sum-all').innerText = `฿ ${sAll.toLocaleString()}`;
+            document.getElementById('ledger-list').innerHTML = db_ledger.map(l => `
+                <div class="card p-3 flex justify-between items-center mb-2 border-l-2 border-[#00ffad]">
+                    <div class="w-2/3 truncate"><h4 class="text-[10px] font-bold text-white italic truncate">${l.email}</h4><p class="text-[8px] text-gray-500">${l.date.replace('T', ' ').slice(0, 16)}</p></div>
+                    <p class="text-sm font-black text-[#00ffad]">+฿${l.amt.toLocaleString()}</p>
+                </div>
+            `).join('') || '<div class="text-center italic opacity-20 text-xs py-5">ยังไม่มีประวัติการเติมเงิน</div>';
+        }
+    </script>
+</body>
+</html>

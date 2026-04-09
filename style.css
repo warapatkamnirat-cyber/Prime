@@ -1,0 +1,33 @@
+:root {
+    --gold: #BF953F;
+    --gold-light: #FCF6BA;
+    --dark: #05070a;
+    --glass: rgba(255, 255, 255, 0.03);
+}
+
+body { font-family: 'Kanit', sans-serif; background: var(--dark); color: white; overflow-x: hidden; }
+
+/* ตัวหนังสือสีทองไล่เฉด */
+.gold-text {
+    background: linear-gradient(135deg, #BF953F 0%, #FCF6BA 45%, #AA771C 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* การ์ดกระจก */
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+}
+
+/* ปุ่มหลักสีทอง */
+.btn-prime {
+    background: linear-gradient(to right, #BF953F, #8A6E2F);
+    color: black; font-weight: 800; border-radius: 15px;
+    transition: 0.3s; text-transform: uppercase;
+}
+.btn-prime:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(191, 149, 63, 0.4); }
+
+/* Sidebar */
+#sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
